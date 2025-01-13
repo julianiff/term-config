@@ -5,8 +5,11 @@ font-family = "hack"
 
 window-padding-x = 10
 window-padding-y = 2
+window-save-state = always
 
 keybind=alt+h=goto_split:left
 keybind=alt+j=goto_split:bottom
 keybind=alt+k=goto_split:top
 keybind=alt+l=goto_split:right
+
+mouse-hide-while-typing = true
