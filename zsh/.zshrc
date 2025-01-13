@@ -77,3 +77,17 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
 
+# Terminal title function
+function set_terminal_title() {
+    # Set terminal title to current directory
+    print -Pn "\e]0;%~\a"
+}
+
+# Set up precmd and preexec hooks
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd set_terminal_title
+
+# Configure nvim to keep terminal title
+if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
+    export NVIM_TERM_TITLE="%~"
+fi
