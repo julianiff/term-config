@@ -32,8 +32,8 @@ export STARSHIP_CONFIG="$HOME/.config/term-config/starship/starship.toml"
 eval "$(starship init zsh)"
 
 # Lazy load nvm
-export NVM_DIR="$HOME/.nvm"
-alias nvm='unalias nvm && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm use 20.16 --silent && nvm'
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 # Path configurations
 export PATH="/usr/bin/python3:$PATH"
