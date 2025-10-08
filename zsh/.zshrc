@@ -49,6 +49,7 @@ alias lg='lazygit'
 alias gc='git checkout'
 alias lzd='lazydocker'
 alias y='y'
+alias n='nvim'
 
 # Functions
 function y() {
@@ -89,3 +90,6 @@ add-zsh-hook precmd set_terminal_title
 if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
     export NVIM_TERM_TITLE="%~"
 fi
+
+# docker once again
+export DOCKER_HOST=unix://$HOME/.orbstack/run/docker.sock
