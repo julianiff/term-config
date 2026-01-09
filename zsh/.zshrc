@@ -43,6 +43,9 @@ export PATH="$PNPM_HOME:$PATH"
 export GOPATH=$HOME/go
 export EDITOR=nvim
 export GPG_TTY=$(tty)
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
+export PATH="/opt/homebrew/opt/openvpn/sbin:$PATH"
 
 # Aliases
 alias lg='lazygit'
