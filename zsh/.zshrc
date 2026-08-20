@@ -31,27 +31,34 @@ export STARSHIP_CONFIG="$HOME/.config/term-config/starship/starship.toml"
 
 eval "$(starship init zsh)"
 
-# Lazy load nvm
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+# Lazy load nvm (deferred until first use)
+export NVM_DIR="$HOME/.nvm"
+_load_nvm() {
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+}
+nvm() { unfunction nvm node npm npx 2>/dev/null; _load_nvm; nvm "$@"; }
+node() { unfunction nvm node npm npx 2>/dev/null; _load_nvm; node "$@"; }
+npm() { unfunction nvm node npm npx 2>/dev/null; _load_nvm; npm "$@"; }
+npx() { unfunction nvm node npm npx 2>/dev/null; _load_nvm; npx "$@"; }
 
-# Path configurations
-export PATH="/usr/bin/python3:$PATH"
-export PATH="/Applications/PhpStorm.app/Contents/MacOS:$PATH"
+# Environment variables
+export GOPATH="$HOME/go"
 export PNPM_HOME="$HOME/Library/pnpm"
-export PATH="$PNPM_HOME:$PATH"
-export GOPATH=$HOME/go
 export EDITOR=nvim
 export GPG_TTY=$(tty)
+
+# Path configurations (consolidated)
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
+export PATH="$PNPM_HOME:$PATH"
+export PATH="/Applications/PhpStorm.app/Contents/MacOS:$PATH"
 export PATH="/opt/homebrew/opt/openvpn/sbin:$PATH"
 
 # Aliases
 alias lg='lazygit'
-alias gc='git checkout'
+alias gco='git checkout'
 alias lzd='lazydocker'
-alias y='y'
 alias n='nvim'
 
 # Functions
@@ -69,15 +76,28 @@ function y() {
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-# Load completions
+# Load completions (with caching for faster startup)
 autoload -Uz compinit
-compinit
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+    compinit
+else
+    compinit -C
+fi
 
 # History configuration
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
-setopt appendhistory
+setopt APPEND_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY
+setopt INC_APPEND_HISTORY
+
+# Shell options
+setopt AUTO_CD
+setopt CORRECT
+setopt NO_BEEP
 
 # Terminal title function
 function set_terminal_title() {
@@ -90,9 +110,12 @@ autoload -Uz add-zsh-hook
 add-zsh-hook precmd set_terminal_title
 
 # Configure nvim to keep terminal title
-if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
+if [ -n "$NVIM" ]; then
     export NVIM_TERM_TITLE="%~"
 fi
 
-# docker once again
+# OrbStack Docker socket
 export DOCKER_HOST=unix://$HOME/.orbstack/run/docker.sock
+
+# bun completions
+[ -s "/Users/julianiff/.bun/_bun" ] && source "/Users/julianiff/.bun/_bun"
