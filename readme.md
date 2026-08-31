@@ -1,61 +1,128 @@
 # Terminal Configuration Setup
 
-This guide explains how to set up your terminal environment using these dotfiles.
+Dotfiles for reproducing this terminal environment: zsh (with zinit, starship,
+autosuggestions, syntax highlighting), WezTerm, Ghostty, and lazygit.
 
-## Required Tools
+## Directory Structure
 
-Install the following tools using Homebrew:
-
-```bash
-# Install essential tools
-brew install starship            
-brew install autojump           
-brew install zsh-autosuggestions 
-brew install lazygit            
-brew install lazydocker         
-brew install --cask wezterm     
-
-# Install fonts
-brew tap homebrew/cask-fonts
-brew install --cask font-hack 
-```
-
-## Configuration Setup
-
-Clone repo into .config/term-config to get directory Structure
 ```
 ~/.config/term-config/
 ├── zsh/
-│   └── .zshrc          # ZSH configuration
+│   └── .zshrc          # ZSH configuration (ZDOTDIR target)
 ├── starship/
 │   └── starship.toml   # Starship prompt configuration
-└── wezterm/
-    └── wezterm.lua     # WezTerm terminal configuration
+├── ghostty/
+│   └── config          # Ghostty terminal configuration
+├── wezterm/
+│   └── wezterm.lua     # WezTerm terminal configuration
+└── lazygit/
+    └── config.yml      # lazygit configuration (currently empty/defaults)
 ```
 
-Set up ZSH configuration:
+## 1. Clone the repo
+
 ```bash
-# Create ZDOTDIR environment variable
+git clone <this-repo-url> ~/.config/term-config
+```
+
+## 2. Install required tools (Homebrew)
+
+```bash
+# Shell prompt & plugins
+brew install starship
+brew install autojump
+
+# TUIs used by aliases/functions (lg, lzd, y)
+brew install lazygit
+brew install lazydocker
+brew install yazi
+
+# Editor
+brew install neovim
+
+# Terminals (pick one or both)
+brew install --cask wezterm
+brew install --cask ghostty
+
+# Font used by both terminals
+brew install --cask font-hack
+```
+
+`zsh-autosuggestions` and `fast-syntax-highlighting` do **not** need to be
+installed via Homebrew — `.zshrc` bootstraps
+[zinit](https://github.com/zdharma-continuum/zinit) on first launch, which
+then installs and loads both plugins automatically.
+
+## 3. Point zsh at this config
+
+```bash
 echo 'export ZDOTDIR="$HOME/.config/term-config/zsh"' > ~/.zshenv
 ```
 
-Create symlinks:
+Open a new shell. On first launch, zinit will clone itself and install the
+`fast-syntax-highlighting` / `zsh-autosuggestions` plugins automatically —
+this can take a few seconds.
+
+## 4. Symlink terminal configs
+
 ```bash
-# WezTerm config symlink
+# WezTerm
 ln -s ~/.config/term-config/wezterm/wezterm.lua ~/.wezterm.lua
-# Ghostty config symlink - needs ghostty folder
+
+# Ghostty (create the target dir first if needed)
+mkdir -p ~/.config/ghostty
 ln -s ~/.config/term-config/ghostty/config ~/.config/ghostty/config
+
+# lazygit (optional — config.yml is currently empty, so lazygit defaults apply either way)
+mkdir -p ~/Library/Application\ Support/lazygit
+ln -s ~/.config/term-config/lazygit/config.yml ~/Library/Application\ Support/lazygit/config.yml
 ```
 
-## Tool-specific Setup
+Starship doesn't need a symlink — `.zshrc` points `STARSHIP_CONFIG` directly
+at `~/.config/term-config/starship/starship.toml`.
 
-### Node Version Manager (nvm)
+## 5. Other tools referenced in `.zshrc`
+
+These aren't strictly required to get a shell working, but `.zshrc` expects
+them for full functionality:
+
 ```bash
+# Node Version Manager (lazy-loaded on first `node`/`npm`/`npx`/`nvm` call)
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+# Bun
+curl -fsSL https://bun.sh/install | bash
+
+# Go (sets up $GOPATH/bin on PATH)
+brew install go
+
+# pnpm (only $PNPM_HOME/bin is added to PATH — install pnpm itself separately)
+brew install pnpm
+
+# GPG (GPG_TTY is exported for commit signing / gpg prompts)
+brew install gnupg
 ```
+
+`.zshrc` also sets `DOCKER_HOST` to OrbStack's docker socket
+(`~/.orbstack/run/docker.sock`). Install [OrbStack](https://orbstack.dev) if
+you want `docker`/`lazydocker` to work out of the box; otherwise remove that
+line.
+
+There's also a hardcoded `PATH` entry for PhpStorm
+(`/Applications/PhpStorm.app/Contents/MacOS`) — remove it from `.zshrc` if
+you don't use PhpStorm.
+
+## 6. Verify
+
+Open a new terminal (WezTerm or Ghostty) and confirm:
+
+- Prompt shows the starship format (directory, git branch/status, cmd duration)
+- `lg` opens lazygit, `lzd` opens lazydocker, `n` opens neovim, `y` opens yazi
+- `alt+h/j/k/l` moves focus between splits (Ghostty) / panes (WezTerm)
 
 ## Customization
 
-- Modify `~/.config/term-config/starship/starship.toml` to customize your prompt
-- Edit `~/.config/term-config/wezterm/wezterm.lua` to customize your terminal
-- Add new aliases or functions to `~/.config/term-config/zsh/.zshrc`
+- Prompt: `~/.config/term-config/starship/starship.toml`
+- WezTerm: `~/.config/term-config/wezterm/wezterm.lua`
+- Ghostty: `~/.config/term-config/ghostty/config`
+- Shell aliases/functions/env vars: `~/.config/term-config/zsh/.zshrc`
