@@ -84,6 +84,9 @@ else
     compinit -C
 fi
 
+# fzf
+source <(fzf --zsh)
+
 # History configuration
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -119,3 +122,11 @@ export DOCKER_HOST=unix://$HOME/.orbstack/run/docker.sock
 
 # bun completions
 [ -s "/Users/julianiff/.bun/_bun" ] && source "/Users/julianiff/.bun/_bun"
+
+# pnpm
+export PNPM_HOME="/Users/julian.iff/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
