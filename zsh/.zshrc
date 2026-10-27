@@ -1,3 +1,4 @@
+typeset -U path PATH
 export PATH="/opt/homebrew/bin:$PATH"
 
 # Install zinit if not installed
@@ -130,3 +131,5 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
+
+export PATH="$HOME/.cargo/bin:$PATH"
